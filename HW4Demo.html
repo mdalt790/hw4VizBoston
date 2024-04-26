@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Departmental Data Analysis</title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@latest"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/ScrollMagic.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ScrollMagic/2.0.7/plugins/debug.addIndicators.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 20px;
+            align-items: center;
+        }
+        .title {
+            font-size: 24px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .subtitle {
+            font-size: 18px;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .graph-container {
+            opacity: 1;
+            transition: opacity 0.5s ease-in-out;
+            margin-bottom: 50px;
+            align-items: center;
+        }
+        .text {
+            text-align: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="title">Paying Professors Less May be More!</h1>
+        <p class="text">
+            Does paying professors less actually make for a better student experience? What a crazy claim to make surely there is no evidence to back that up right? Well lets look at the data... 
+        </p>
+        <p class="subtitle">Overview of Pay Per Department</p>
+        <div id="vis1" class="graph-container"></div>
+        <p class="text">
+            First lets take a look at annual pay across all departments at UMB. Most departments on average earn between 50,000 to 100,000. A few are significantly higher on average could it be these
+            departments earn much higher ratings?
+        </p>
+        
+        <p class="subtitle">Correlation Between Pay and Ratings</p>
+        <div id="vis2" class="graph-container"></div>
+        <p class="text">
+            Here we can see our first graph encoded with the rating for each professor in each department as the size of the circle. There seems to be no pattern between pay, rating, and department. 
+            Our previous outliers are no more. Now we can see the department "College of Management Dean's Office" no longer stands out and it actually shows us it was simply one highly rated and highly paid indivudual.
+            Even as you zoom in on particular clumps of data no clear pattern emerges it almost seems all professors are fairly highly rated no matter the pay or department.
+        </p>
+
+        <p class="subtitle">Average Ratings Across Departments</p>
+        <div id="vis3" class="graph-container"></div>
+        <p class="text">
+            Woah now looking at the average ratings across all departments we see the issue... everyone loves their professors so much! That doesnt make sense everyone has professors they dont like could it be something wrong with out data?
+            Rate MY Professor may be skewed positivly in favor of professors no matter the pay or department.
+        </p>
+
+        <p class="subtitle">Detailed Comparison of Pay and Ratings</p>
+        <div id="vis4" class="graph-container"></div>
+        <p class="text">
+            Here we see the whole picture of ratings and annual pay for each professor. It turns out most professors have a great rating while many with below 2 rating simply do not have a lot of ratings.
+            We have a large cluster of points in the 70,000 to 110,000 pay and the ratings tend to be quite high. Although many low paying professors have great ratings many also do not and even the best paid professors can have some awful 
+            ratings. Overall it seems no matter the professors pay their rating may be skewed one way or another do to the nature of rate my professor. Only the most outspoken people will leave a review
+            so it is hard to say how the average student feels towards the teaching experience. Paying professors more or less will not actually change the rating all that much.
+        </p>
+    </div>
+
+    <script>
+        // Your Vega Embed script here for each 'visX'
+        const graph1 = {
+            "params": [{
+                "name": "zoomdsgdsgdsf",
+                "select": "interval",
+                "bind": "scales"
+            }],
+            
+            "width": 1000,
+            
+            "data": {"url": "Data/combined_with_departments.csv"}, 
+
+            "mark": {"type": "bar", "tooltip": true},
+
+            "transform": [{"filter": "datum.ANNUAL_RATE > 0 && datum.NUM_RATINGS > 0 && datum.RATING > 0"}],
+            
+            "encoding": {
+                "x":{
+                    "field": "DEPARTMENT",
+                    "type":"nominal",
+                    "axis": {"title": "Department"}
+                },
+                "y": {
+                    "field": "ANNUAL_RATE",
+                    "type":"quantitative",
+                    "aggregate": "average",
+                    "axis": {"title": "Annual Pay"}
+                },
+            }
+        }; 
+        const graph2 = {
+            "params": [{
+                "name": "zoomdsgdsgdsf",
+                "select": "interval",
+                "bind": "scales"
+            }],
+            "width":1000,
+            "data": {"url": "Data/combined_with_departments.csv"}, 
+            "mark": {"type": "circle", "tooltip": true},
+
+            "encoding": {
+                "x": {
+                    "field": "DEPARTMENT",
+                    "type": "nominal",
+                    "axis": {"title": "Department"}
+                },
+                "y": {
+                    "field": "ANNUAL_RATE",
+                    "type":"quantitative",
+                    // "aggregate": "average",
+                    "axis": {"title": "Annual Pay"}
+                },
+                "size": {
+                    "field": "RATING",
+                    "type": "quantitative",
+                    "title": "Rating",
+                    "Scale": {"range": [0, 5]}
+                },
+            }
+
+        }; 
+        const graph3 = {
+            "params": [{
+                "name": "zoomdsgdsgdsf",
+                "select": "interval",
+                "bind": "scales"
+            }],
+            "width": 1000,
+            "data": {"url": "Data/combined_with_departments.csv"}, 
+            "mark": {"type": "bar", "tooltip": true},
+            "transform": [{"filter": "datum.ANNUAL_RATE > 0 && datum.NUM_RATINGS > 0 && datum.RATING > 0"}],
+            "encoding": {
+                "x": {
+                "field": "DEPARTMENT",
+                "type": "nominal",
+                "axis": {"title": "Department"}
+                },
+                "y": {
+                "field": "RATING",
+                "type": "quantitative",
+                "aggregate": "average",
+                "axis": {"title": "Average Rating"}
+            },            
+        }
+        }; 
+        const graph4 = {
+            "params": [{
+                "name": "zoomdsgdsgdsf",
+                "select": "interval",
+                "bind": "scales"
+            }],
+            "width":1000,
+            "data": {"url": "Data/combined_with_departments.csv"}, 
+            "mark": {"type": "circle", "tooltip": true},
+            "transform": [{"filter": "datum.ANNUAL_RATE > 0 && datum.NUM_RATINGS > 0 && datum.RATING > 0"}],
+            "encoding": {
+                "y": {
+                    "field": "RATING",
+                    "type": "quantitative",
+                    "axis": {"title": "Rating"}
+                },
+                "x": {
+                    "field": "ANNUAL_RATE",
+                    "type":"quantitative",
+                    // "aggregate": "average",
+                    "axis": {"title": "Annual Pay"}
+                },
+                "size": {
+                    "field": "NUM_RATINGS",
+                    "type": "quantitative",
+                    "title": "Number of Ratings",
+                    "scale": {
+                    "range": [10, 1000]
+                }
+            }
+        }
+        }
+
+        vegaEmbed('#vis1', graph1);
+        vegaEmbed('#vis2', graph2);
+        vegaEmbed('#vis3', graph3);
+        vegaEmbed('#vis4', graph4);
+    </script>
+    <script>
+        // var controller = new ScrollMagic.Controller();
+        // document.querySelectorAll('.graph-container').forEach(function(graph) {
+        //     new ScrollMagic.Scene({
+        //         triggerElement: graph,
+        //         duration: '50%', // Duration is half of the viewport height
+        //         triggerHook: 0.5
+        //     })
+        //     .setTween(graph, {opacity: 1})
+        //     .addTo(controller);
+        // });
+    </script>
+</body>
+</html>
